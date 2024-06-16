@@ -46,7 +46,26 @@ Add blog from UI
 ![image](https://github.com/siddhant21/Blog_project/assets/46870926/f978e506-4550-48a0-81d2-6280c7a58c22)
 
 
+**Curl command**
+Post call
 
+curl --location 'http://localhost:8000/api/create_blog/' \
+--header 'Content-Type: application/json' \
+--data '{
+    "user_id": 6,
+    "blog_title": "trial blog",
+    "blog_text": "This is the content of the new blog post."
+}'
+
+Get call
+
+curl --location --request GET 'http://localhost:8000/api/search_blogs/?q=lorem' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name":"test",
+    "price":1100,
+    "quantity":10
+}'
 
 License
 This project is licensed under the MIT License - see the LICENSE file for details.
