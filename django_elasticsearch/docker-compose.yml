@@ -1,0 +1,77 @@
+# services:
+#   elasticsearch:
+#     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+#     volumes:
+#       - esdata01:/usr/share/elasticsearch/data
+#     ports:
+#       - 9200:9200
+#     environment:
+#       - discovery.type=single-node
+#       - xpack.security.enabled=false
+
+# volumes:
+#   esdata01:
+# version: '3'
+
+# version: '3'
+
+version: '2'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    container_name: es_elasticsearch
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: ktech_zookeeper
+    ports:
+      - "2181:2181"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'  # Limit to 20% of a single CPU
+          memory: 512m  # Limit memory to 512MB
+    restart: unless-stopped
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: ktech_kafka
+    ports:
+      - "9092:9092"
+    expose:
+      - "9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://192.168.1.22:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_CREATE_TOPICS: "test_topic:1:1"
+      KAFKA_LOG_RETENTION_HOURS: 1  # Keep logs for 1 hour
+      KAFKA_LOG_RETENTION_BYTES: 104857600  # 100 MB
+      KAFKA_LOG_SEGMENT_BYTES: 10485760  # 10 MB
+      KAFKA_RETENTION_CHECK_INTERVAL_MS: 300000  # Check retention every 5 minutes
+      KAFKA_MESSAGE_MAX_BYTES: 1000000  # Maximum message size 1 MB
+      KAFKA_NUM_PARTITIONS: 1  # Single partition for test_topic
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1  # Single replica
+      KAFKA_HEAP_OPTS: -Xmx512m -Xms512m  # Limit JVM heap size to 512MB
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 50% of a single CPU
+          memory: 1g  # Limit memory to 1GB
+    restart: unless-stopped
+
+volumes:
+  esdata01:
