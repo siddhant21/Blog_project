@@ -20,10 +20,7 @@ from app.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path("", index),
     path("", index, name="home"),
-    # path('search/', index_home, name="index_home"),
     path("api/search_blogs/", search_blogs, name="search-blogs"),
     path("api/create_blog/", create_blog, name="create-blog"),
-    # path("api/blogs/", BlogView.as_view(), name="blog-list")
 ]
